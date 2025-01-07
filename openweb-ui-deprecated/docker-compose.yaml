@@ -1,0 +1,40 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - ./open-webui:/app/backend/data
+    ports:
+      - ${OPEN_WEBUI_PORT-3003}:8080
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      WEBUI_AUTH: False
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ENABLE_RAG_WEB_SEARCH: True
+      RAG_WEB_SEARCH_ENGINE: "searxng"
+      RAG_WEB_SEARCH_RESULT_COUNT:
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
+      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+    restart: always
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng:/etc/searxng
+    restart: always
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: pipelines
+    ports:
+      - 9099:9099
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./pipelines:/app/pipelines
+    environment:
+      PIPELINES_URLS: https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/anthropic_manifold_pipeline.py
+
+    restart: always
