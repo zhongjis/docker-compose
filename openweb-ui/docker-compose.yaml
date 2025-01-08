@@ -1,33 +1,42 @@
-version: "3.8"
-
+# NOTE: reference - https://github.com/open-webui/open-webui/blob/main/run-compose.sh
 services:
   ollama:
-    image: ollama/ollama
-    container_name: ollama
-    ports:
-      - "11434:11434"
     volumes:
-      - /home/ollama:/root/.ollama
+      - ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: ["gpu"]
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG-rocm}
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    environment:
+      - "HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION-11.0.0}"
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    build:
+      context: .
+      args:
+        OLLAMA_BASE_URL: "/ollama"
+      dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
     container_name: open-webui
-    ports:
-      - "8282:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
       - open-webui:/app/backend/data
-    restart: unless-stopped
+    depends_on:
+      - ollama
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
     environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      WEBUI_SECRET_KEY:
       WEBUI_AUTH: False
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
 
 volumes:
-  open-webui:
+  ollama: {}
+  open-webui: {}
