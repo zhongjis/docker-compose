@@ -1,1 +1,2 @@
 .env
+openweb-ui/pipelines/anthropic_manifold_pipeline/valves.json
