@@ -53,9 +53,10 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - ./searxng:/etc/searxng
+      - searxng:/etc/searxng
     restart: always
 
 volumes:
   open-webui: {}
   pipelines: {}
+  searxng: {}
