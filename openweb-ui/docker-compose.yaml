@@ -16,6 +16,7 @@ services:
       # basic
       WEBUI_SECRET_KEY:
       WEBUI_AUTH: False
+      # openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       # ollama
       OLLAMA_BASE_URL: http://localhost:11434
