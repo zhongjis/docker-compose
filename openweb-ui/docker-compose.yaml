@@ -1,17 +1,12 @@
 # NOTE: reference - https://github.com/open-webui/open-webui/blob/main/run-compose.sh
 services:
   open-webui:
-    build:
-      context: .
-      args:
-        OLLAMA_BASE_URL: "/ollama"
-      dockerfile: Dockerfile
     image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
     container_name: open-webui
     volumes:
       - open-webui:/app/backend/data
     ports:
-      - ${OPEN_WEBUI_PORT-3000}:8080
+      - 3000:8080
     environment:
       # basic
       WEBUI_SECRET_KEY:
@@ -19,16 +14,13 @@ services:
       # openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       # ollama
-      OLLAMA_BASE_URL: http://localhost:11434
+      OLLAMA_BASE_URL: http://host.containers.internal:11434
       # searxng
       ENABLE_RAG_WEB_SEARCH: True
       RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
-      SEARXNG_QUERY_URL: "http://searxng:8081/search?q=<query>"
-    network_mode: host
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      SEARXNG_QUERY_URL: "http://host.containers.internal:8081/search?q=<query>"
     depends_on:
       - pipelines
       - searxng
@@ -39,8 +31,6 @@ services:
     container_name: pipelines
     ports:
       - 9099:9099
-    extra_hosts:
-      - host.docker.internal:host-gateway
     volumes:
       - pipelines:/app/pipelines
     environment:
