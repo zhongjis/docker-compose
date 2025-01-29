@@ -14,17 +14,16 @@ services:
       # openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       # ollama
-      OLLAMA_BASE_URL: http://host.containers.internal:11434
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
       # searxng
       ENABLE_RAG_WEB_SEARCH: True
       RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
-      SEARXNG_QUERY_URL: "http://host.containers.internal:8081/search?q=<query>"
+      SEARXNG_QUERY_URL: "http://host.docker.internal:8081/search?q=<query>"
     depends_on:
       - pipelines
       - searxng
-    network_mode: "slirp4netns:allow_host_loopback=true"
     restart: always
 
   pipelines:
