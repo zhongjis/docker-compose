@@ -24,7 +24,7 @@ services:
     depends_on:
       - pipelines
       - searxng
-    network_mode: "slirp4netns:allow_host_loopback=true"
+    network_mode: "pasta:--map-gw"
     restart: always
 
   pipelines:
