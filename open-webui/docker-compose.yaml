@@ -21,6 +21,7 @@ services:
       RAG_WEB_SEARCH_RESULT_COUNT:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
       SEARXNG_QUERY_URL: "http://host.docker.internal:8081/search?q=<query>"
+      ANONYMIZED_TELEMETRY: False
     depends_on:
       - pipelines
       - searxng
