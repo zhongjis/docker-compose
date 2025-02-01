@@ -1,0 +1,28 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    environment:
+      # basic
+      WEBUI_SECRET_KEY:
+      WEBUI_AUTH: False
+      # openai
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # ollama
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      # searxng
+      ENABLE_RAG_WEB_SEARCH: True
+      RAG_WEB_SEARCH_ENGINE: "searxng"
+      RAG_WEB_SEARCH_RESULT_COUNT:
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
+      SEARXNG_QUERY_URL: "http://host.docker.internal:8081/search?q=<query>"
+      ANONYMIZED_TELEMETRY: False
+    network_mode: "slirp4netns:allow_host_loopback=true"
+    restart: unless-stopped
+
+volumes:
+  open-webui: {}
