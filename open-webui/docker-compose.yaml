@@ -11,8 +11,9 @@ services:
       # basic
       WEBUI_SECRET_KEY:
       WEBUI_AUTH: False
-      # openai
+      # keys
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       # ollama
       OLLAMA_BASE_URL: http://host.docker.internal:11434
       # searxng
@@ -22,10 +23,7 @@ services:
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
       SEARXNG_QUERY_URL: "http://host.docker.internal:8081/search?q=<query>"
       ANONYMIZED_TELEMETRY: False
-    depends_on:
-      - pipelines
-      - searxng
-    network_mode: "pasta:--map-gw"
+    network_mode: "slirp4netns:allow_host_loopback=true"
     restart: always
 
   searxng:
