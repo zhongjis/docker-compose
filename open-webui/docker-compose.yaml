@@ -18,8 +18,8 @@ services:
       # searxng
       ENABLE_RAG_WEB_SEARCH: True
       RAG_WEB_SEARCH_ENGINE: "searxng"
-      RAG_WEB_SEARCH_RESULT_COUNT:
-      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 5
+      RAG_WEB_SEARCH_RESULT_COUNT: 5
+      RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
       SEARXNG_QUERY_URL: "http://host.docker.internal:8081/search?q=<query>"
       ANONYMIZED_TELEMETRY: False
     depends_on:
@@ -28,27 +28,29 @@ services:
     network_mode: "pasta:--map-gw"
     restart: always
 
-  pipelines:
-    image: ghcr.io/open-webui/pipelines:main
-    container_name: pipelines
-    ports:
-      - 9099:9099
-    volumes:
-      - pipelines:/app/pipelines
-    environment:
-      PIPELINES_URLS: https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/anthropic_manifold_pipeline.py
-    restart: always
-
   searxng:
-    image: searxng/searxng:latest
     container_name: searxng
+    image: searxng/searxng:latest
     ports:
       - "8081:8080"
     volumes:
-      - searxng:/etc/searxng
-    restart: always
+      - ./searxng:/etc/searxng:rw
+    env_file:
+      - .env
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
 
 volumes:
   open-webui: {}
-  pipelines: {}
   searxng: {}
